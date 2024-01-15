@@ -4,6 +4,7 @@ import (
 	"devbook/src/database"
 	"devbook/src/models"
 	"devbook/src/repositories"
+	"devbook/src/responses"
 	"encoding/json"
 	"io"
 	"net/http"
@@ -13,33 +14,32 @@ import (
 func CreateUser(w http.ResponseWriter, r *http.Request) {
 	body, error := io.ReadAll(r.Body)
 	if error != nil {
-		http.Error(w, "Invalid request body", http.StatusBadRequest)
+		responses.Error(w, http.StatusUnprocessableEntity, error)
+		return
 	}
 
 	var user models.User
 	if error = json.Unmarshal(body, &user); error != nil {
-		http.Error(w, "Invalid request body", http.StatusBadRequest)
+		responses.Error(w, http.StatusBadRequest, error)
+		return
 	}
 
 	db, error := database.Connect()
 	if error != nil {
-		http.Error(w, "Error connecting to the database", http.StatusInternalServerError)
+		responses.Error(w, http.StatusInternalServerError, error)
 		return
 	}
+	defer db.Close()
 
 	repository := repositories.UsersRepository(db)
 	ID, error := repository.Insert(user)
 	if error != nil {
-		http.Error(w, "Error inserting user", http.StatusInternalServerError)
+		responses.Error(w, http.StatusInternalServerError, error)
 		return
 	}
 
-	w.WriteHeader(http.StatusCreated)
 	response := map[string]uint64{"id": ID}
-	if error := json.NewEncoder(w).Encode(response); error != nil {
-		http.Error(w, "Error converting user to JSON", http.StatusInternalServerError)
-		return
-	}
+	responses.JSON(w, http.StatusCreated, response)
 }
 
 // GetUsers returns all users
