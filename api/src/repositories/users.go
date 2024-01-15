@@ -3,6 +3,7 @@ package repositories
 import (
 	"database/sql"
 	"devbook/src/models"
+	"fmt"
 )
 
 type users struct {
@@ -33,4 +34,27 @@ func (u users) Insert(user models.User) (uint64, error) {
 	}
 
 	return uint64(lastInsertedID), nil
+}
+
+// GetUsers returns all users filtered by name or nickname
+func (u users) GetUsers(nameOrNickname string) ([]models.User, error) {
+	nameOrNickname = fmt.Sprintf("%%%s%%", nameOrNickname) // %nameOrNickname%
+
+	lines, error := u.db.Query("SELECT id, name, nickname, email, created_at FROM users WHERE name LIKE ? OR nickname LIKE ?", nameOrNickname, nameOrNickname)
+	if error != nil {
+		return nil, error
+	}
+	defer lines.Close()
+
+	var users []models.User
+	for lines.Next() {
+		var user models.User
+		if error = lines.Scan(&user.ID, &user.Name, &user.Nickname, &user.Email, &user.CreatedAt); error != nil {
+			return nil, error
+		}
+
+		users = append(users, user)
+	}
+
+	return users, nil
 }
