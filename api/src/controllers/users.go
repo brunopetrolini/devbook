@@ -33,10 +33,10 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Error inserting user", http.StatusInternalServerError)
 		return
 	}
-	user.ID = ID
 
 	w.WriteHeader(http.StatusCreated)
-	if error := json.NewEncoder(w).Encode(user); error != nil {
+	response := map[string]uint64{"id": ID}
+	if error := json.NewEncoder(w).Encode(response); error != nil {
 		http.Error(w, "Error converting user to JSON", http.StatusInternalServerError)
 		return
 	}
