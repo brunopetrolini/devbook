@@ -28,9 +28,16 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	repository := repositories.UsersRepository(db)
-	_, error = repository.Insert(user)
+	ID, error := repository.Insert(user)
 	if error != nil {
 		http.Error(w, "Error inserting user", http.StatusInternalServerError)
+		return
+	}
+	user.ID = ID
+
+	w.WriteHeader(http.StatusCreated)
+	if error := json.NewEncoder(w).Encode(user); error != nil {
+		http.Error(w, "Error converting user to JSON", http.StatusInternalServerError)
 		return
 	}
 }
