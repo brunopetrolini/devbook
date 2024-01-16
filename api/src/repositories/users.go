@@ -91,3 +91,18 @@ func (u users) UpdateUser(userID uint64, user models.User) error {
 
 	return nil
 }
+
+// DeleteUser deletes a user from the database
+func (u users) DeleteUser(userID uint64) error {
+	statement, error := u.db.Prepare("DELETE FROM users WHERE id = ?")
+	if error != nil {
+		return error
+	}
+	defer statement.Close()
+
+	if _, error = statement.Exec(userID); error != nil {
+		return error
+	}
+
+	return nil
+}
