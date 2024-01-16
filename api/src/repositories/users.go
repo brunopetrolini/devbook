@@ -76,3 +76,18 @@ func (u users) FindUser(userId uint64) (models.User, error) {
 
 	return user, nil
 }
+
+// UpdateUser updates a user in the database
+func (u users) UpdateUser(userID uint64, user models.User) error {
+	statement, error := u.db.Prepare("UPDATE users SET name = ?, nickname = ?, email = ? WHERE id = ?")
+	if error != nil {
+		return error
+	}
+	defer statement.Close()
+
+	if _, error = statement.Exec(user.Name, user.Nickname, user.Email, userID); error != nil {
+		return error
+	}
+
+	return nil
+}
