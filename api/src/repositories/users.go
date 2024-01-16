@@ -106,3 +106,21 @@ func (u users) DeleteUser(userID uint64) error {
 
 	return nil
 }
+
+// SearchByEmail searches a user by its email
+func (u users) SearchByEmail(email string) (models.User, error) {
+	line, error := u.db.Query("SELECT id, password FROM users WHERE email = ?", email)
+	if error != nil {
+		return models.User{}, error
+	}
+	defer line.Close()
+
+	var user models.User
+	if line.Next() {
+		if error = line.Scan(&user.ID, &user.Password); error != nil {
+			return models.User{}, error
+		}
+	}
+
+	return user, nil
+}
