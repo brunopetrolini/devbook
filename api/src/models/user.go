@@ -1,6 +1,7 @@
 package models
 
 import (
+	"devbook/src/security"
 	"errors"
 	"strings"
 	"time"
@@ -23,7 +24,9 @@ func (u *User) Prepare(step string) error {
 	if error := u.validate(step); error != nil {
 		return error
 	}
-	u.format()
+	if error := u.format(step); error != nil {
+		return error
+	}
 	return nil
 }
 
@@ -51,8 +54,18 @@ func (u *User) validate(step string) error {
 	return nil
 }
 
-func (u *User) format() {
+func (u *User) format(step string) error {
 	u.Name = strings.TrimSpace(u.Name)
 	u.Nickname = strings.TrimSpace(u.Nickname)
 	u.Email = strings.TrimSpace(u.Email)
+
+	if step == "register" {
+		hash, error := security.Hash(u.Password)
+		if error != nil {
+			return error
+		}
+		u.Password = string(hash)
+	}
+
+	return nil
 }
