@@ -1,7 +1,7 @@
 package routes
 
 import (
-	"devbook/src/controllers"
+	"devbook/src/application/controllers"
 	"net/http"
 )
 

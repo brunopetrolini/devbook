@@ -1,8 +1,8 @@
 package main
 
 import (
-	"devbook/src/config"
-	"devbook/src/router"
+	"devbook/src/application/router"
+	"devbook/src/infra/config"
 	"fmt"
 	"log"
 	"net/http"

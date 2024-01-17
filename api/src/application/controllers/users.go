@@ -1,10 +1,10 @@
 package controllers
 
 import (
-	"devbook/src/database"
-	"devbook/src/models"
-	"devbook/src/repositories"
-	"devbook/src/responses"
+	"devbook/src/application/responses"
+	"devbook/src/domain/models"
+	"devbook/src/infra/database"
+	"devbook/src/infra/repositories"
 	"encoding/json"
 	"io"
 	"net/http"

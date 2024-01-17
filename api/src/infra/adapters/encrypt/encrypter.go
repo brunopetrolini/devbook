@@ -1,4 +1,4 @@
-package security
+package encrypter
 
 import "golang.org/x/crypto/bcrypt"
 

@@ -1,7 +1,7 @@
 package authentication
 
 import (
-	"devbook/src/config"
+	"devbook/src/infra/config"
 	"time"
 
 	jwt "github.com/dgrijalva/jwt-go"

@@ -1,8 +1,6 @@
 package routes
 
-import (
-	"devbook/src/controllers"
-)
+import "devbook/src/application/controllers"
 
 var loginRoute = Route{
 	URI:         "/login",

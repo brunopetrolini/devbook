@@ -1,12 +1,12 @@
 package controllers
 
 import (
-	"devbook/src/authentication"
-	"devbook/src/database"
-	"devbook/src/models"
-	"devbook/src/repositories"
-	"devbook/src/responses"
-	"devbook/src/security"
+	"devbook/src/application/responses"
+	"devbook/src/domain/models"
+	"devbook/src/infra/adapters/authentication"
+	encrypter "devbook/src/infra/adapters/encrypt"
+	"devbook/src/infra/database"
+	"devbook/src/infra/repositories"
 	"encoding/json"
 	"io"
 	"net/http"
@@ -40,7 +40,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if error = security.Compare(persistedUser.Password, user.Password); error != nil {
+	if error = encrypter.Compare(persistedUser.Password, user.Password); error != nil {
 		responses.Error(w, http.StatusUnauthorized, error)
 		return
 	}

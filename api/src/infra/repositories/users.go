@@ -2,7 +2,7 @@ package repositories
 
 import (
 	"database/sql"
-	"devbook/src/models"
+	"devbook/src/domain/models"
 	"fmt"
 )
 

@@ -1,7 +1,7 @@
 package models
 
 import (
-	"devbook/src/security"
+	encrypter "devbook/src/infra/adapters/encrypt"
 	"errors"
 	"strings"
 	"time"
@@ -60,7 +60,7 @@ func (u *User) format(step string) error {
 	u.Email = strings.TrimSpace(u.Email)
 
 	if step == "register" {
-		hash, error := security.Hash(u.Password)
+		hash, error := encrypter.Hash(u.Password)
 		if error != nil {
 			return error
 		}
