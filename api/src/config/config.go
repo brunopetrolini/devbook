@@ -14,6 +14,8 @@ var (
 	ConnectionString string = ""
 	// Port is the port to run the server on
 	Port int = 0
+	// SecretKey is the secret key to generate the token
+	SecretKey []byte
 )
 
 // LoadConfig initializes environment variables
@@ -34,4 +36,6 @@ func LoadConfig() {
 		os.Getenv("MYSQL_PASSWORD"),
 		os.Getenv("MYSQL_DATABASE"),
 	)
+
+	SecretKey = []byte(os.Getenv("API_SECRET"))
 }

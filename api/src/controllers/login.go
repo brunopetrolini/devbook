@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"devbook/src/authentication"
 	"devbook/src/database"
 	"devbook/src/models"
 	"devbook/src/repositories"
@@ -44,5 +45,10 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	responses.JSON(w, http.StatusOK, nil)
+	token, _ := authentication.GenerateToken(persistedUser.ID)
+	response := map[string]string{
+		"access_token": token,
+	}
+
+	responses.JSON(w, http.StatusOK, response)
 }
