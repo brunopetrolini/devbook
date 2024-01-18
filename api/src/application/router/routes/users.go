@@ -10,7 +10,7 @@ var usersRoutes = []Route{
 		URI:         "/users",
 		Method:      http.MethodPost,
 		Function:    controllers.CreateUser,
-		RequireAuth: false,
+		RequireAuth: true,
 	},
 	{
 		URI:         "/users",
@@ -22,7 +22,7 @@ var usersRoutes = []Route{
 		URI:         "/users/{id}",
 		Method:      http.MethodGet,
 		Function:    controllers.FindUser,
-		RequireAuth: false,
+		RequireAuth: true,
 	},
 	{
 		URI:         "/users/{id}",
@@ -34,6 +34,6 @@ var usersRoutes = []Route{
 		URI:         "/users/{id}",
 		Method:      http.MethodDelete,
 		Function:    controllers.DeleteUser,
-		RequireAuth: false,
+		RequireAuth: true,
 	},
 }
