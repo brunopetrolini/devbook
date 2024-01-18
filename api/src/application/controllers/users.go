@@ -3,9 +3,11 @@ package controllers
 import (
 	"devbook/src/application/responses"
 	"devbook/src/domain/models"
+	"devbook/src/infra/adapters/authentication"
 	"devbook/src/infra/database"
 	"devbook/src/infra/repositories"
 	"encoding/json"
+	"fmt"
 	"io"
 	"net/http"
 	"strconv"
@@ -106,6 +108,17 @@ func UpdateUser(w http.ResponseWriter, r *http.Request) {
 	userID, error := strconv.ParseUint(params["id"], 10, 64)
 	if error != nil {
 		responses.Error(w, http.StatusBadRequest, error)
+		return
+	}
+
+	authenticatedUserID, error := authentication.ExtractUserID(r)
+	if error != nil {
+		responses.Error(w, http.StatusUnauthorized, error)
+		return
+	}
+
+	if userID != authenticatedUserID {
+		responses.Error(w, http.StatusForbidden, fmt.Errorf("it's not possible to edit a user that is not yours"))
 		return
 	}
 
