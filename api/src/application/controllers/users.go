@@ -7,7 +7,7 @@ import (
 	"devbook/src/infra/database"
 	"devbook/src/infra/repositories"
 	"encoding/json"
-	"fmt"
+	"errors"
 	"io"
 	"net/http"
 	"strconv"
@@ -118,7 +118,7 @@ func UpdateUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if userID != authenticatedUserID {
-		responses.Error(w, http.StatusForbidden, fmt.Errorf("it's not possible to edit a user that is not yours"))
+		responses.Error(w, http.StatusForbidden, errors.New("it's not possible to edit a user that is not yours"))
 		return
 	}
 
@@ -172,7 +172,7 @@ func DeleteUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if userID != authenticatedUserID {
-		responses.Error(w, http.StatusForbidden, fmt.Errorf("it's not possible to delete a user that is not yours"))
+		responses.Error(w, http.StatusForbidden, errors.New("it's not possible to delete a user that is not yours"))
 		return
 	}
 
@@ -194,6 +194,12 @@ func DeleteUser(w http.ResponseWriter, r *http.Request) {
 
 // FollowUser follows a user
 func FollowUser(w http.ResponseWriter, r *http.Request) {
+	authenticatedUserID, error := authentication.ExtractUserID(r)
+	if error != nil {
+		responses.Error(w, http.StatusBadRequest, error)
+		return
+	}
+
 	params := mux.Vars(r)
 
 	followerID, error := strconv.ParseUint(params["id"], 10, 64)
@@ -202,14 +208,8 @@ func FollowUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	authenticatedUserID, error := authentication.ExtractUserID(r)
-	if error != nil {
-		responses.Error(w, http.StatusBadRequest, error)
-		return
-	}
-
 	if followerID == authenticatedUserID {
-		responses.Error(w, http.StatusForbidden, fmt.Errorf("it's not possible to follow yourself"))
+		responses.Error(w, http.StatusForbidden, errors.New("it's not possible to follow yourself"))
 		return
 	}
 
@@ -222,6 +222,43 @@ func FollowUser(w http.ResponseWriter, r *http.Request) {
 
 	repository := repositories.FollowersRepository(db)
 	if error = repository.FollowUser(authenticatedUserID, followerID); error != nil {
+		responses.Error(w, http.StatusInternalServerError, error)
+		return
+	}
+
+	responses.JSON(w, http.StatusNoContent, nil)
+}
+
+// UnfollowUser unfollows a user
+func UnfollowUser(w http.ResponseWriter, r *http.Request) {
+	authenticatedUserID, error := authentication.ExtractUserID(r)
+	if error != nil {
+		responses.Error(w, http.StatusUnauthorized, error)
+		return
+	}
+
+	params := mux.Vars(r)
+
+	followerID, error := strconv.ParseUint(params["id"], 10, 64)
+	if error != nil {
+		responses.Error(w, http.StatusBadRequest, error)
+		return
+	}
+
+	if followerID == authenticatedUserID {
+		responses.Error(w, http.StatusForbidden, errors.New("it's not possible to unfollow yourself"))
+		return
+	}
+
+	db, error := database.Connect()
+	if error != nil {
+		responses.Error(w, http.StatusInternalServerError, error)
+		return
+	}
+	defer db.Close()
+
+	repository := repositories.FollowersRepository(db)
+	if error = repository.UnfollowUser(authenticatedUserID, followerID); error != nil {
 		responses.Error(w, http.StatusInternalServerError, error)
 		return
 	}
